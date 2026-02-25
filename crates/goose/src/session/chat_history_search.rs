@@ -223,16 +223,33 @@ impl<'a> ChatHistorySearch<'a> {
         &self,
         session_messages: &HashMap<String, SessionMessageGroup>,
     ) -> Result<HashMap<String, usize>> {
-        let mut session_totals: HashMap<String, usize> = HashMap::new();
-        for session_id in session_messages.keys() {
-            let count: i64 =
-                sqlx::query_scalar("SELECT COUNT(*) FROM messages WHERE session_id = ?")
-                    .bind(session_id)
-                    .fetch_one(self.pool)
-                    .await
-                    .unwrap_or(0);
-            session_totals.insert(session_id.clone(), count as usize);
+        if session_messages.is_empty() {
+            return Ok(HashMap::new());
         }
+
+        let session_ids: Vec<&String> = session_messages.keys().collect();
+        let placeholders = vec!["?"; session_ids.len()].join(", ");
+        let sql = format!(
+            "SELECT session_id, COUNT(*) FROM messages WHERE session_id IN ({}) GROUP BY session_id",
+            placeholders
+        );
+
+        let mut query = sqlx::query_as::<_, (String, i64)>(&sql);
+        for id in &session_ids {
+            query = query.bind(id);
+        }
+
+        let results = query.fetch_all(self.pool).await?;
+
+        let mut session_totals: HashMap<String, usize> = session_ids
+            .iter()
+            .map(|&id| (id.clone(), 0))
+            .collect();
+
+        for (session_id, count) in results {
+            session_totals.insert(session_id, count as usize);
+        }
+
         Ok(session_totals)
     }
 
