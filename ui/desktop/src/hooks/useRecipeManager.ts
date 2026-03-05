@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Recipe, scanRecipe } from '../recipe';
+import { Recipe, ScheduledRecipe, scanRecipe } from '../recipe';
 import { createUserMessage } from '../types/message';
 import { Message } from '../api';
 
@@ -9,7 +9,7 @@ import { useChatContext } from '../contexts/ChatContext';
 import { ChatType } from '../types/chat';
 import { toastError, toastSuccess } from '../toasts';
 
-export const useRecipeManager = (chat: ChatType, recipe?: Recipe | null) => {
+export const useRecipeManager = (chat: ChatType, recipe?: ScheduledRecipe | null) => {
   const [isParameterModalOpen, setIsParameterModalOpen] = useState(false);
   const [isRecipeWarningModalOpen, setIsRecipeWarningModalOpen] = useState(false);
   const [recipeAccepted, setRecipeAccepted] = useState(false);

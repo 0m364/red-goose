@@ -1,5 +1,5 @@
 import { NavigateFunction } from 'react-router-dom';
-import { Recipe } from '../api';
+import { ScheduledRecipe } from '../recipe';
 import { UserInput } from '../types/message';
 
 export type View =
@@ -26,7 +26,7 @@ export type ViewOptions = {
   sessionDetails?: unknown;
   error?: string;
   baseUrl?: string;
-  recipe?: Recipe;
+  recipe?: ScheduledRecipe;
   parentView?: View;
   parentViewOptions?: ViewOptions;
   disableAnimation?: boolean;
